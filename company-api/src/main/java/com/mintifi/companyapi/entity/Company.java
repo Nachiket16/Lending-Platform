@@ -4,6 +4,6 @@ public class Company {
 //company details, Core field will be added here
 
   private long id;
-
+  private String name;
 
 }
