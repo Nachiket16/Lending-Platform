@@ -1,28 +1,29 @@
 package com.mintifi.companyapi.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "association")
-@Data
+@Table(name = "industry")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Association {
-  //Buyer and Supplier relations with the company
+@Builder
+public class Industry {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
-  private long buyerCompanyId;
-  private long supplierCompanyId;
-  private LocalDateTime associatedSince;
-//  private String anchorLevel;
+
+  private String name;
+  @Column(name = "parent_id")
+  private long parentId;
+
 
 }

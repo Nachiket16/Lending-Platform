@@ -12,8 +12,8 @@ public class CompanyController {
 // Rest API -> CRUD OPS
 
   @PostMapping("/add")
-  public ResponseEntity<> createCompany(@RequestBody String payload){
-
+  public ResponseEntity<String> createCompany(@RequestBody String payload){
+    return null;
   }
 
 
