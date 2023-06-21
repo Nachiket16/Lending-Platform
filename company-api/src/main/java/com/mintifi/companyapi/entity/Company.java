@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,11 +22,19 @@ public class Company {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
   private String name;
-  private String businessPan;
-  private String companyType;
-  private String companyCin;
-  private Date dateOfInc;
-  private Date dateOfRegistrationWithAnchor;
+  private String type;
+  private String bizEmail;
+  private String mobileNumber;
+  private LocalDateTime dateOfInc;
+  private String bizPan;
+  private String bizCin;
+  private String bizTin;
+  private String noOfDirectors;
+  private String udyamCertNo;
+  private long industryId;
+  private String brandLogoUrl;
+  private long parentId;
+
 
 
 }
