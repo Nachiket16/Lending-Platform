@@ -5,7 +5,7 @@ spring:
         driver-class-name: com.mysql.cj.jdbc.Driver
         password: secret
         url: jdbc:mysql://localhost:3306/lending
-        username: appuser
+        username: root
     jpa:
         hibernate:
             ddl-auto: update
