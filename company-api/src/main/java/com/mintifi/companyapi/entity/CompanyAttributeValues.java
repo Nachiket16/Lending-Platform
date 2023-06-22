@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 public class CompanyAttributeValues {
   //company value with attribute details like-> regex, required, type
 
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
