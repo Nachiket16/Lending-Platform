@@ -10,6 +10,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "company_attribute_value")
@@ -17,11 +18,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @ValidateAttributeValue
-@JsonIgnoreProperties(ignoreUnknown = true)
+@ToString
 public class CompanyAttributeValues {
   //company value with attribute details like-> regex, required, type
-
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;

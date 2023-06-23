@@ -11,7 +11,6 @@ public class AttributeValueValidator implements ConstraintValidator<ValidateAttr
 
     @Autowired
     private AttributeRepository attributeRepository;
-    // Assuming you have a repository for Attribute
 
     @Override
     public boolean isValid(CompanyAttributeValues attributeValue, ConstraintValidatorContext context) {
@@ -19,18 +18,14 @@ public class AttributeValueValidator implements ConstraintValidator<ValidateAttr
         String regex = attributeValue.getRegex();
         String value = attributeValue.getAttributeValue();
 
-        if (type.equalsIgnoreCase("Type1")) {
-            // Perform type-specific validation for Type1
-            // For example, check if value is a valid integer
+        if (type.equalsIgnoreCase("Integer")) {
             try {
                 Integer.parseInt(value);
             } catch (NumberFormatException e) {
                 return false;
             }
-        } else if (type.equalsIgnoreCase("Type2")) {
-            // Perform type-specific validation for Type2
-            // For example, check if value length is between 5 and 10 characters
-            if (value.length() < 5 || value.length() > 10) {
+        } else if (type.equalsIgnoreCase("String")) {
+            if(value.isEmpty()){
                 return false;
             }
         }
@@ -38,9 +33,8 @@ public class AttributeValueValidator implements ConstraintValidator<ValidateAttr
         // Perform regex validation if a regex is specified
         if (regex != null && !regex.isEmpty()) {
             Pattern pattern = Pattern.compile(regex);
-            if (!pattern.matcher(value).matches()) {
-                return false;
-            }
+            boolean matches = Pattern.matches(regex, value);
+            return matches;
         }
 
         return true;
