@@ -2,7 +2,6 @@ package com.mintifi.companyapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,7 +29,7 @@ public class CompanyModel {
   private String brandLogoUrl;
   private long parentId;
 
-  private Attribute[] attributes;
+  private AttributeModel[] attributes;
 
 }
 

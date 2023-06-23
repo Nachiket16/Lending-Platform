@@ -15,7 +15,7 @@ import jakarta.validation.Constraint;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidateAttributeValue {
 
-  String message() default "Invalid attribute value";
+  String message() default "{AttributeValueValidator.error}";
 
   Class<?>[] groups() default {};
 

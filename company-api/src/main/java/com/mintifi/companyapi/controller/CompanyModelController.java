@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/v1/company-model/")
+@RequestMapping("/v1/companies")
 public class CompanyModelController {
   @Autowired
   private CompanyService companyService;
 
-  @PostMapping("/add")
+  @PostMapping()
   public ResponseEntity<CompanyModel> createCompany(@Validated @RequestBody String payload){
     CompanyModel company = companyService.addCompanyModel(payload);
     return ResponseEntity.ok(company);
