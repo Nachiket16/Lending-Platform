@@ -29,7 +29,7 @@ public class CompanyModel {
   private String brandLogoUrl;
   private long parentId;
 
-  private AttributeModel[] attributes;
+  private Attributes[] attributes;
 
 }
 

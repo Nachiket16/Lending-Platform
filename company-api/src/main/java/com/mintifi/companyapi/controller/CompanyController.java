@@ -4,9 +4,9 @@ import com.mintifi.companyapi.entity.Company;
 import com.mintifi.companyapi.service.CompanyService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +23,12 @@ public class CompanyController {
   @PostMapping("/add")
   public ResponseEntity<Company> createCompany(@RequestBody String payload){
     Company company = companyService.addCompany(payload);
+    return ResponseEntity.ok(company);
+  }
+  @PostMapping("/{companyId}")
+  public ResponseEntity<Company> createCompanyCustom(@PathVariable("companyId") long id,
+      @RequestBody String payload){
+    Company company = companyService.addCustomCompany(id,payload);
     return ResponseEntity.ok(company);
   }
 

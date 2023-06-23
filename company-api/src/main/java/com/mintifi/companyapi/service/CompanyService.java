@@ -5,14 +5,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mintifi.companyapi.entity.Company;
 import com.mintifi.companyapi.entity.CompanyAttributeValues;
 import com.mintifi.companyapi.entity.CompanyAttributes;
-import com.mintifi.companyapi.model.AttributeModel;
+import com.mintifi.companyapi.exception.ResourceNotFoundException;
+import com.mintifi.companyapi.model.Attributes;
 import com.mintifi.companyapi.model.CompanyModel;
 import com.mintifi.companyapi.repository.AttributeRepository;
 import com.mintifi.companyapi.repository.CompanyRepository;
 import com.mintifi.companyapi.repository.ValueRepository;
 import jakarta.persistence.Transient;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,11 +68,11 @@ public class CompanyService {
 
     Company company = modelMapper.map(companyModel, Company.class);
     Company savedCompany = companyRepository.save(company);
-    AttributeModel[] attributes = companyModel.getAttributes();
+    Attributes[] attributes = companyModel.getAttributes();
 
     List<CompanyAttributes> attributesList = new ArrayList<>();
 
-    for (AttributeModel attribute :attributes){
+    for (Attributes attribute :attributes){
       CompanyAttributeValues companyAttributeValues = new CompanyAttributeValues();
       CompanyAttributes companyAttribute = modelMapper.map(attribute, CompanyAttributes.class);
       attributesList.add(companyAttribute);
@@ -89,6 +93,23 @@ public class CompanyService {
     return companyModel;
   }
 
+  @Transient
+  public Company addCustomCompany(long companyId ,String companyModelString) {
+    Map<String,String> customAttribute = new LinkedHashMap<>();
+    Company company = companyRepository.findById(companyId)
+        .orElseThrow(()->new ResourceNotFoundException(companyId));
+    JSONObject jsonObject = new JSONObject(companyModelString);
 
+    for (String key : jsonObject.keySet()) {
+      if (key.endsWith("__c")) {
+        String value = jsonObject.get(key).toString();
+        attributeRepository.findByApiName(key).orElseThrow(()->new ResourceNotFoundException(key));
+        customAttribute.put(key,value);
+        System.out.println("Key: " + key + ", Value: " + value);
+      }
+    }
+    return null;
+
+  }
 
 }
