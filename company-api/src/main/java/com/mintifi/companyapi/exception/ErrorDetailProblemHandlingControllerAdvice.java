@@ -3,6 +3,8 @@ package com.mintifi.companyapi.exception;
 import jakarta.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -56,9 +58,25 @@ public class ErrorDetailProblemHandlingControllerAdvice {
     @ExceptionHandler({ConstraintViolationException.class})
     public ResponseEntity<ApiExceptionResponse> dataIntegrityViolationException(
         ConstraintViolationException ex) {
+        ProblemDetail problemDetail =
+            ProblemDetail.forStatusAndDetail(
+                HttpStatusCode.valueOf(400), "Invalid request content.");
+
         String message = ex.getMessage();
-        ApiExceptionResponse apiResponse = new ApiExceptionResponse(message, false);
-        return new ResponseEntity<>(apiResponse, HttpStatus.CONFLICT);
+        String patternString = "messageTemplate='(.*?)'";
+
+        Pattern pattern = Pattern.compile(patternString);
+        Matcher matcher = pattern.matcher(message);
+
+        if (matcher.find()) {
+            String messageTemplate = matcher.group(1);
+            message = messageTemplate;
+            System.out.println("Extracted messageTemplate: " + messageTemplate);
+        } else {
+            System.out.println("No messageTemplate found.");
+        }
+        ApiExceptionResponse apiResponse = new ApiExceptionResponse(message);
+        return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
     }
 
 
@@ -93,7 +111,6 @@ public class ErrorDetailProblemHandlingControllerAdvice {
     public class ApiExceptionResponse {
 
         private String message;
-        private boolean success;
     }
 
 }

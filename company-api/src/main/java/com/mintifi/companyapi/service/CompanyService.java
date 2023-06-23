@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mintifi.companyapi.entity.Company;
 import com.mintifi.companyapi.entity.CompanyAttributeValues;
 import com.mintifi.companyapi.entity.CompanyAttributes;
-import com.mintifi.companyapi.model.Attribute;
+import com.mintifi.companyapi.model.AttributeModel;
 import com.mintifi.companyapi.model.CompanyModel;
 import com.mintifi.companyapi.repository.AttributeRepository;
 import com.mintifi.companyapi.repository.CompanyRepository;
@@ -64,11 +64,11 @@ public class CompanyService {
 
     Company company = modelMapper.map(companyModel, Company.class);
     Company savedCompany = companyRepository.save(company);
-    Attribute[] attributes = companyModel.getAttributes();
+    AttributeModel[] attributes = companyModel.getAttributes();
 
     List<CompanyAttributes> attributesList = new ArrayList<>();
 
-    for (Attribute attribute :attributes){
+    for (AttributeModel attribute :attributes){
       CompanyAttributeValues companyAttributeValues = new CompanyAttributeValues();
       CompanyAttributes companyAttribute = modelMapper.map(attribute, CompanyAttributes.class);
       attributesList.add(companyAttribute);
