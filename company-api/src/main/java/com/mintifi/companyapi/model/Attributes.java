@@ -15,32 +15,41 @@ import lombok.ToString;
 @Builder
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AttributeModel {
+public class Attributes {
   
+  @NotEmpty
   @JsonProperty("label")
   private String label;
   
+  @NotEmpty
   @JsonProperty("apiName")
   private String apiName;
   
+  @NotEmpty
   @JsonProperty("group")
   private String group;
   
+  @NotEmpty
   @JsonProperty("type")
   private String type;
   
+  @NotEmpty
   @JsonProperty("disabled")
   private boolean disabled;
   
+  @NotEmpty
   @JsonProperty("required")
   private boolean required;
   
+  @NotEmpty
   @JsonProperty("regex")
   private String regex;
   
+  @NotEmpty
   @JsonProperty("value")
   private String value;
   
+  @NotEmpty
   @JsonProperty("error")
   private String error;
 

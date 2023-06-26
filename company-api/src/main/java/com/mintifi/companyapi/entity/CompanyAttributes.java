@@ -22,7 +22,7 @@ public class CompanyAttributes {
   private long id;
   private String label;
   private String apiName;
-  @Column(name = "group")
+  @Column(name = "`group`")
   private String group;
   private String type;
   private String regex;

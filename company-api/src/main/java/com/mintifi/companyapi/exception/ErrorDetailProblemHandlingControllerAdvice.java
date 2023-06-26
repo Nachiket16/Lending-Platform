@@ -54,6 +54,13 @@ public class ErrorDetailProblemHandlingControllerAdvice {
         response.setRejectedValue(exception.getStatus().value());
         return new ResponseEntity<>(response, exception.getStatus());
     }
+    @ExceptionHandler({ResourceNotFoundException.class})
+    public ResponseEntity<ApiExceptionResponse> resourceNotFoundExceptionHandler(
+        ResourceNotFoundException ex) {
+        String message = ex.getMessage();
+        ApiExceptionResponse apiResponse = new ApiExceptionResponse(message);
+        return new ResponseEntity<ApiExceptionResponse>(apiResponse, HttpStatus.NOT_FOUND);
+    }
 
     @ExceptionHandler({ConstraintViolationException.class})
     public ResponseEntity<ApiExceptionResponse> dataIntegrityViolationException(
