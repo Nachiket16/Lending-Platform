@@ -3,6 +3,8 @@ package com.mintifi.companyapi;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mintifi.companyapi.entity.Company;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
+import org.modelmapper.convention.NamingConventions;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +18,12 @@ public class CompanyApiApplication {
 
 	@Bean
 	public ModelMapper modelMapper(){
-		return new ModelMapper();
+		ModelMapper modelMapper = new ModelMapper();
+		modelMapper.getConfiguration()
+				.setMatchingStrategy(MatchingStrategies.STRICT)
+				.setSkipNullEnabled(true)	;
+
+		return modelMapper;
 	}
 
 	@Bean

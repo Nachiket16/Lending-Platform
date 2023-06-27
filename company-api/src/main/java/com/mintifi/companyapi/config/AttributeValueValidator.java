@@ -47,7 +47,7 @@ public class AttributeValueValidator implements ConstraintValidator<ValidateAttr
             Pattern pattern = Pattern.compile(regex);
             if (!pattern.matcher(value).matches()) {
                 context.disableDefaultConstraintViolation();
-                context.buildConstraintViolationWithTemplate("Invalid value format").addConstraintViolation();
+                context.buildConstraintViolationWithTemplate(error!=null?error:"Invalid value").addConstraintViolation();
                 return false;
             }
         }
