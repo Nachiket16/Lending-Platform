@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/v1/attribute")
 public class AttributeController {
-  //TODO: attribute name must be unique
   @Autowired
   private CompanyAttributeService companyAttributeService;
 

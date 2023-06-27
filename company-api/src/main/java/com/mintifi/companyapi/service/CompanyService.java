@@ -8,6 +8,7 @@ import com.mintifi.companyapi.entity.Company;
 import com.mintifi.companyapi.entity.CompanyAttributeValues;
 import com.mintifi.companyapi.entity.CompanyAttributes;
 import com.mintifi.companyapi.exception.ResourceNotFoundException;
+import com.mintifi.companyapi.mapper.CompanyMapper;
 import com.mintifi.companyapi.model.Attributes;
 import com.mintifi.companyapi.model.CompanyModel;
 import com.mintifi.companyapi.repository.AttributeRepository;
@@ -16,9 +17,8 @@ import com.mintifi.companyapi.repository.ValueRepository;
 import jakarta.persistence.Transient;
 import jakarta.persistence.Tuple;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import lombok.AllArgsConstructor;
 import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -26,22 +26,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class CompanyService {
 
   @Autowired
   private CompanyRepository companyRepository;
-
   @Autowired
   private ModelMapper modelMapper;
-
   @Autowired
   private ObjectMapper objectMapper;
-
   @Autowired
   private AttributeRepository attributeRepository;
-
   @Autowired
   private ValueRepository valueRepository;
+
+  @Autowired
+  private CompanyMapper companyMapper;
 
   public List<Company> getAllCompany(){
     List<Company> all = companyRepository.findAll();
@@ -98,19 +98,27 @@ public class CompanyService {
 
   @Transient
   public Company addCustomCompany(long companyId ,String companyModelString) {
-    modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
     List<CompanyAttributes> companyAttributesList = null;
+    JSONObject jsonObject = new JSONObject(companyModelString);
+    CompanyModel companyModel;
+
     Company company = companyRepository.findById(companyId)
         .orElseThrow(()->new ResourceNotFoundException(companyId));
-    JSONObject jsonObject = new JSONObject(companyModelString);
+    try {
+      companyModel =objectMapper.readValue(companyModelString, CompanyModel.class);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
 
+    Company updatedCompany = companyMapper.updateEntityFromModel(companyModel, company);
+    Company updatedEntity = companyRepository.save(updatedCompany);
     for (String key : jsonObject.keySet()) {
       if (key.endsWith("__c")) {
         CompanyAttributeValues companyAttributeValues = new CompanyAttributeValues();
         String value = jsonObject.get(key).toString();
         CompanyAttributes companyAttributes = attributeRepository.findByApiName(key)
             .orElseThrow(() -> new ResourceNotFoundException(key));
-        companyAttributeValues.setCompanyId(company.getId());
+        companyAttributeValues.setCompanyId(updatedEntity.getId());
         companyAttributeValues.setCompanyAttributeId(companyAttributes.getId());
         companyAttributeValues.setRegex(companyAttributes.getRegex());
         companyAttributeValues.setType(companyAttributes.getType());
@@ -120,16 +128,7 @@ public class CompanyService {
         CompanyAttributeValues entityCompanyAttributeValue = valueRepository.save(companyAttributeValues);
       }
     }
-    CompanyModel companyModel;
-    try {
-      companyModel =objectMapper.readValue(companyModelString, CompanyModel.class);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
 
-    Company updatedCompany = modelMapper.map(companyModel, Company.class);
-    updatedCompany.setId(company.getId());
-    Company updatedEntity = companyRepository.save(updatedCompany);
     return updatedEntity;
   }
 
@@ -176,11 +175,16 @@ public class CompanyService {
       mainJson.put("brandLogoUrl", brandLogoUrl);
       mainJson.put("parentId  ", parentId);
       // Add different columns JsonObject as a nested object
-      mainJson.put(tuple.get("api_name", String.class), tuple.get("attribute_value",
-          String.class));
+      if (tuple.get("api_name")!=null && tuple.get("attribute_value")!=null) {
+        mainJson.put(tuple.get("api_name", String.class), tuple.get("attribute_value",
+            String.class));
+      }
+      System.out.println("Main Json : "+mainJson);
     }
     try {
-      return objectMapper.writeValueAsString(mainJson);
+      String string = objectMapper.writeValueAsString(mainJson);
+      System.out.println("string = " + string);
+      return string;
     } catch (Exception e) {
       e.printStackTrace();
       return null;
