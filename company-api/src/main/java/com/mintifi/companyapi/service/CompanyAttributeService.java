@@ -32,9 +32,9 @@ public class CompanyAttributeService {
       e.getMessage();
     }
     Attributes[] attributes = companyModel.getAttributes();
-    for (Attributes attributeModel: attributes){
+    for (Attributes attributeModel : attributes) {
       CompanyAttributes companyAttributes = new CompanyAttributes();
-      companyAttributes=modelMapper.map(attributeModel, CompanyAttributes.class);
+      companyAttributes = modelMapper.map(attributeModel, CompanyAttributes.class);
       CompanyAttributes save = attributeRepository.save(companyAttributes);
       companyAttributesList.add(save);
     }
