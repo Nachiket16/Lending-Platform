@@ -18,6 +18,7 @@ import jakarta.persistence.Transient;
 import jakarta.persistence.Tuple;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
@@ -43,31 +44,31 @@ public class CompanyService {
   @Autowired
   private CompanyMapper companyMapper;
 
-  public List<Company> getAllCompany(){
+  public List<Company> getAllCompany() {
     List<Company> all = companyRepository.findAll();
     return all;
   }
 
-  public Company addCompany(String companyPayload){
+  public Company addCompany(String companyPayload) {
     Company company;
     try {
-      company =objectMapper.readValue(companyPayload, Company.class);
+      company = objectMapper.readValue(companyPayload, Company.class);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
     Company save = companyRepository.save(company);
     return save;
   }
+
   @Transient
-  public CompanyModel addCompanyModel(String companyModelString){
+  public CompanyModel addCompanyModel(String companyModelString) {
     modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
     CompanyModel companyModel;
     try {
-      companyModel =objectMapper.readValue(companyModelString, CompanyModel.class);
+      companyModel = objectMapper.readValue(companyModelString, CompanyModel.class);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
-    System.out.println("companyModel = " + companyModel);
 
     Company company = modelMapper.map(companyModel, Company.class);
     Company savedCompany = companyRepository.save(company);
@@ -75,11 +76,11 @@ public class CompanyService {
 
     List<CompanyAttributes> attributesList = new ArrayList<>();
 
-    for (Attributes attribute :attributes){
+    for (Attributes attribute : attributes) {
       CompanyAttributeValues companyAttributeValues = new CompanyAttributeValues();
       CompanyAttributes companyAttribute = modelMapper.map(attribute, CompanyAttributes.class);
       attributesList.add(companyAttribute);
-        CompanyAttributes saveCompanyAttribute = attributeRepository.save(companyAttribute);
+      CompanyAttributes saveCompanyAttribute = attributeRepository.save(companyAttribute);
       System.out.println("saveCompanyAttribute = " + saveCompanyAttribute);
 
       companyAttributeValues.setCompanyId(savedCompany.getId());
@@ -92,20 +93,20 @@ public class CompanyService {
       System.out.println("savedCompanyAttrValue = " + savedCompanyAttrValue);
 
     }
-
     return companyModel;
   }
 
   @Transient
-  public Company addCustomCompany(long companyId ,String companyModelString) {
+  public String addCustomCompany(long companyId, String companyModelString) {
     List<CompanyAttributes> companyAttributesList = null;
+    Optional<CompanyAttributeValues> companyAttributeValue;
     JSONObject jsonObject = new JSONObject(companyModelString);
     CompanyModel companyModel;
 
     Company company = companyRepository.findById(companyId)
-        .orElseThrow(()->new ResourceNotFoundException(companyId));
+        .orElseThrow(() -> new ResourceNotFoundException(companyId));
     try {
-      companyModel =objectMapper.readValue(companyModelString, CompanyModel.class);
+      companyModel = objectMapper.readValue(companyModelString, CompanyModel.class);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
@@ -118,6 +119,14 @@ public class CompanyService {
         String value = jsonObject.get(key).toString();
         CompanyAttributes companyAttributes = attributeRepository.findByApiName(key)
             .orElseThrow(() -> new ResourceNotFoundException(key));
+        companyAttributeValue = valueRepository.
+            findByCompanyAttributeIdAndCompanyID(
+                companyAttributes.getId(),
+                updatedCompany.getId());
+        System.out.println("companyAttributeValues = " + companyAttributeValue);
+        if (companyAttributeValue.isPresent()){
+          companyAttributeValues.setId(companyAttributeValue.get().getId());
+        }
         companyAttributeValues.setCompanyId(updatedEntity.getId());
         companyAttributeValues.setCompanyAttributeId(companyAttributes.getId());
         companyAttributeValues.setRegex(companyAttributes.getRegex());
@@ -125,16 +134,20 @@ public class CompanyService {
         companyAttributeValues.setGroup(companyAttributes.getGroup());
         companyAttributeValues.setError(companyAttributes.getError());
         companyAttributeValues.setAttributeValue(value);
-        CompanyAttributeValues entityCompanyAttributeValue = valueRepository.save(companyAttributeValues);
+        System.out.println("companyAttributeValues.getAttributeValue() = " + companyAttributeValues.getAttributeValue());
+        CompanyAttributeValues entityCompanyAttributeValue = valueRepository.save(
+            companyAttributeValues);
       }
     }
-
-    return updatedEntity;
+    List<Tuple> companyCustomAttributeWithValue = companyRepository.getCompanyAttributeWithValue(
+        updatedCompany.getId());
+    String stringJson = convert(companyCustomAttributeWithValue);
+    return stringJson;
   }
 
-  public String getCompanyAttributeValue(Long id){
+  public String getCompanyAttributeValue(Long id) {
     Company company = companyRepository.findById(id)
-        .orElseThrow(()->new ResourceNotFoundException(id));
+        .orElseThrow(() -> new ResourceNotFoundException(id));
     List<Tuple> companyAttributeWithValue = companyRepository.getCompanyAttributeWithValue(id);
     String stringJson = convert(companyAttributeWithValue);
     return stringJson;
@@ -175,11 +188,11 @@ public class CompanyService {
       mainJson.put("brandLogoUrl", brandLogoUrl);
       mainJson.put("parentId  ", parentId);
       // Add different columns JsonObject as a nested object
-      if (tuple.get("api_name")!=null && tuple.get("attribute_value")!=null) {
+      if (tuple.get("api_name") != null && tuple.get("attribute_value") != null) {
         mainJson.put(tuple.get("api_name", String.class), tuple.get("attribute_value",
             String.class));
       }
-      System.out.println("Main Json : "+mainJson);
+      System.out.println("Main Json : " + mainJson);
     }
     try {
       String string = objectMapper.writeValueAsString(mainJson);

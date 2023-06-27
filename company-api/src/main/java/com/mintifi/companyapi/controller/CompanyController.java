@@ -28,9 +28,9 @@ public class CompanyController {
   }
 
   @PutMapping("/{companyId}")
-  public ResponseEntity<Company> addCompanyWithCustomAttribute(@PathVariable("companyId") long id,
+  public ResponseEntity<String> addCompanyWithCustomAttribute(@PathVariable("companyId") long id,
       @RequestBody String payload) {
-    Company company = companyService.addCustomCompany(id, payload);
+    String company = companyService.addCustomCompany(id, payload);
     return ResponseEntity.ok(company);
   }
 
