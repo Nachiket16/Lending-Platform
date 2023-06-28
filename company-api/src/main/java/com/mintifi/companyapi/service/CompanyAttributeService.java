@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mintifi.companyapi.entity.CompanyAttributes;
 import com.mintifi.companyapi.model.Attributes;
 import com.mintifi.companyapi.model.CompanyModel;
-import com.mintifi.companyapi.repository.AttributeRepository;
+import com.mintifi.companyapi.repository.CompanyAttributeRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.modelmapper.ModelMapper;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 public class CompanyAttributeService {
 
   @Autowired
-  private AttributeRepository attributeRepository;
+  private CompanyAttributeRepository companyAttributeRepository;
   @Autowired
   private ObjectMapper objectMapper;
   @Autowired
@@ -35,10 +35,15 @@ public class CompanyAttributeService {
     for (Attributes attributeModel : attributes) {
       CompanyAttributes companyAttributes = new CompanyAttributes();
       companyAttributes = modelMapper.map(attributeModel, CompanyAttributes.class);
-      CompanyAttributes save = attributeRepository.save(companyAttributes);
+      CompanyAttributes save = companyAttributeRepository.save(companyAttributes);
       companyAttributesList.add(save);
     }
     return companyAttributesList;
+  }
+
+  public List<CompanyAttributes> getAllCompanyAttribute(){
+    List<CompanyAttributes> companyAttributeRepositoryAll = companyAttributeRepository.findAll();
+    return companyAttributeRepositoryAll;
   }
 
 

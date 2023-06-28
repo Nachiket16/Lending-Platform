@@ -11,7 +11,7 @@ import com.mintifi.companyapi.exception.ResourceNotFoundException;
 import com.mintifi.companyapi.mapper.CompanyMapper;
 import com.mintifi.companyapi.model.Attributes;
 import com.mintifi.companyapi.model.CompanyModel;
-import com.mintifi.companyapi.repository.AttributeRepository;
+import com.mintifi.companyapi.repository.CompanyAttributeRepository;
 import com.mintifi.companyapi.repository.CompanyRepository;
 import com.mintifi.companyapi.repository.ValueRepository;
 import jakarta.persistence.Transient;
@@ -37,7 +37,7 @@ public class CompanyService {
   @Autowired
   private ObjectMapper objectMapper;
   @Autowired
-  private AttributeRepository attributeRepository;
+  private CompanyAttributeRepository companyAttributeRepository;
   @Autowired
   private ValueRepository valueRepository;
 
@@ -49,15 +49,39 @@ public class CompanyService {
     return all;
   }
 
-  public Company addCompany(String companyPayload) {
+  @Transient
+  public String addCompany(String companyPayload) {
     Company company;
     try {
       company = objectMapper.readValue(companyPayload, Company.class);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
-    Company save = companyRepository.save(company);
-    return save;
+    Company entity = companyRepository.save(company);
+    JSONObject jsonObject = new JSONObject(companyPayload);
+
+    for (String key : jsonObject.keySet()) {
+      if (key.endsWith("__c")) {
+        CompanyAttributeValues companyAttributeValues = new CompanyAttributeValues();
+        String value = jsonObject.get(key).toString();
+        CompanyAttributes companyAttributes = companyAttributeRepository.findByApiName(key)
+            .orElseThrow(() -> new ResourceNotFoundException(key));
+        companyAttributeValues.setCompanyId(entity.getId());
+        companyAttributeValues.setCompanyAttributeId(companyAttributes.getId());
+        companyAttributeValues.setRegex(companyAttributes.getRegex());
+        companyAttributeValues.setType(companyAttributes.getType());
+        companyAttributeValues.setGroup(companyAttributes.getGroup());
+        companyAttributeValues.setError(companyAttributes.getError());
+        companyAttributeValues.setAttributeValue(value);
+        CompanyAttributeValues entityCompanyAttributeValue = valueRepository.save(
+            companyAttributeValues);
+      }
+    }
+
+    List<Tuple> companyCustomAttributeWithValue = companyRepository.getCompanyAttributeWithValue(
+        entity.getId());
+    String stringJson = convert(companyCustomAttributeWithValue);
+    return stringJson;
   }
 
   @Transient
@@ -80,7 +104,7 @@ public class CompanyService {
       CompanyAttributeValues companyAttributeValues = new CompanyAttributeValues();
       CompanyAttributes companyAttribute = modelMapper.map(attribute, CompanyAttributes.class);
       attributesList.add(companyAttribute);
-      CompanyAttributes saveCompanyAttribute = attributeRepository.save(companyAttribute);
+      CompanyAttributes saveCompanyAttribute = companyAttributeRepository.save(companyAttribute);
       System.out.println("saveCompanyAttribute = " + saveCompanyAttribute);
 
       companyAttributeValues.setCompanyId(savedCompany.getId());
@@ -117,14 +141,14 @@ public class CompanyService {
       if (key.endsWith("__c")) {
         CompanyAttributeValues companyAttributeValues = new CompanyAttributeValues();
         String value = jsonObject.get(key).toString();
-        CompanyAttributes companyAttributes = attributeRepository.findByApiName(key)
+        CompanyAttributes companyAttributes = companyAttributeRepository.findByApiName(key)
             .orElseThrow(() -> new ResourceNotFoundException(key));
         companyAttributeValue = valueRepository.
             findByCompanyAttributeIdAndCompanyID(
                 companyAttributes.getId(),
                 updatedCompany.getId());
         System.out.println("companyAttributeValues = " + companyAttributeValue);
-        if (companyAttributeValue.isPresent()){
+        if (companyAttributeValue.isPresent()) {
           companyAttributeValues.setId(companyAttributeValue.get().getId());
         }
         companyAttributeValues.setCompanyId(updatedEntity.getId());
@@ -134,7 +158,8 @@ public class CompanyService {
         companyAttributeValues.setGroup(companyAttributes.getGroup());
         companyAttributeValues.setError(companyAttributes.getError());
         companyAttributeValues.setAttributeValue(value);
-        System.out.println("companyAttributeValues.getAttributeValue() = " + companyAttributeValues.getAttributeValue());
+        System.out.println("companyAttributeValues.getAttributeValue() = "
+            + companyAttributeValues.getAttributeValue());
         CompanyAttributeValues entityCompanyAttributeValue = valueRepository.save(
             companyAttributeValues);
       }
