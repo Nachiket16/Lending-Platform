@@ -21,9 +21,9 @@ public class CompanyController {
   @Autowired
   private CompanyService companyService;
 
-  @PostMapping("/add")
-  public ResponseEntity<Company> addCompany(@RequestBody String payload) {
-    Company company = companyService.addCompany(payload);
+  @PostMapping()
+  public ResponseEntity<String> addCompany(@RequestBody String payload) {
+    String company = companyService.addCompany(payload);
     return ResponseEntity.ok(company);
   }
 

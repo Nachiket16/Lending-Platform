@@ -1,7 +1,7 @@
 package com.mintifi.companyapi.config;
 
 import com.mintifi.companyapi.entity.CompanyAttributeValues;
-import com.mintifi.companyapi.repository.AttributeRepository;
+import com.mintifi.companyapi.repository.CompanyAttributeRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.regex.Pattern;
@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class AttributeValueValidator implements ConstraintValidator<ValidateAttributeValue, CompanyAttributeValues> {
 
     @Autowired
-    private AttributeRepository attributeRepository;
+    private CompanyAttributeRepository companyAttributeRepository;
 
     @Override
     public void initialize(ValidateAttributeValue constraintAnnotation) {
