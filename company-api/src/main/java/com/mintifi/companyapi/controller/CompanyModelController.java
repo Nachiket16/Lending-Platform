@@ -22,5 +22,9 @@ public class CompanyModelController {
     return ResponseEntity.ok(company);
   }
 
+  public ResponseEntity<String> addCompanyWithJsonB(@RequestBody String payload){
+    String modelInJsonB = companyService.addCompanyModelInJsonB(payload);
+    return ResponseEntity.ok(modelInJsonB);
+  }
 
 }

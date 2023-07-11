@@ -1,12 +1,23 @@
 server:
   port: 8080
+
 spring:
   datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    username: appuser
+#    password: secret
+#    url: jdbc:mysql://localhost:3306/lending
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: appuser
-    password: secret
-    url: jdbc:mysql://localhost:3306/lending
+    username: Nachiket
+    password: secret1
+    url: postgresql://localhost:5432/company
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+#    spring.datasource.url=jdbc:postgresql://192.168.99.100:5432/coursedb
+#    spring.datasource.username=postgres
+#    spring.datasource.password=mysecretpassword
+#    spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+#    spring.jpa.hibernate.ddl-auto=create

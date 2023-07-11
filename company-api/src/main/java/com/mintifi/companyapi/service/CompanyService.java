@@ -228,4 +228,10 @@ public class CompanyService {
       return null;
     }
   }
+
+  public String addCompanyModelInJsonB(String payload) {
+
+
+    return null;
+  }
 }
